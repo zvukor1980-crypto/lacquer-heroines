@@ -30,40 +30,27 @@ function shade(hex,k){const n=parseInt(hex.slice(1),16);let r=n>>16,gg=n>>8&255,
 function gloss(x,y,w,h,col){const gr=g.createLinearGradient(x,y,x+w,y+h*.3);gr.addColorStop(0,shade(col,-.55));gr.addColorStop(.35,shade(col,.1));gr.addColorStop(.5,shade(col,.75));gr.addColorStop(.62,shade(col,0));gr.addColorStop(1,shade(col,-.7));return gr;}
 function limb(x1,y1,x2,y2,w,col){g.strokeStyle=gloss(Math.min(x1,x2)-w,y1,Math.abs(x2-x1)+w*2,y2-y1,col);g.lineWidth=w;g.lineCap='round';g.beginPath();g.moveTo(x1,y1);g.lineTo(x2,y2);g.stroke();g.strokeStyle='rgba(255,255,255,.55)';g.lineWidth=w*.18;g.beginPath();g.moveTo(x1-w*.2,y1+2);g.lineTo(x2-w*.2,y2-2);g.stroke();}
 // h: {col,hair,skin,weapon} ; st: 'idle'|'walk'|'attack'
-function heroine(x,y,s,h,t,st='idle',face=1){g.save();g.translate(x,y);g.scale(s*face,s);
- const br=Math.sin(t*2.2)*1.5,wk=st=='walk'?Math.sin(t*9):0,at=st=='attack'?Math.max(0,Math.sin(t*10)):0;
- g.fillStyle='rgba(0,0,0,.35)';g.beginPath();g.ellipse(0,0,22,6,0,0,6.28);g.fill();
- // legs (boots)
- limb(-6,-48,-8+wk*10,-4,11,h.col);limb(6,-48,8-wk*10,-4,11,h.col);
- g.fillStyle=shade(h.col,-.6);rr(-15+wk*10,-10,14,10,4);g.fill();rr(1-wk*10,-10,14,10,4);g.fill();
- // torso
- const ty=-92-br*.5;g.fillStyle=gloss(-16,ty,32,48,h.col);rr(-15,ty,30,50,12);g.fill();
- g.fillStyle='rgba(255,255,255,.5)';rr(-9,ty+5,5,34,3);g.fill();
- g.fillStyle=h.acc||'#ffd34d';rr(-15,ty+34,30,6,3);g.fill();// belt
- g.beginPath();g.arc(0,ty+37,4,0,6.28);g.fillStyle='#fff';g.fill();
- // shoulder pads (armor)
- g.fillStyle=gloss(-22,ty,44,14,h.acc||'#ffd34d');g.beginPath();g.ellipse(-15,ty+6,8,6,0,0,6.28);g.ellipse(15,ty+6,8,6,0,0,6.28);g.fill();
- // arms
- const ax=at?24:10+Math.sin(t*2)*2,ay=at?-ty-ty*0-100:ty+40;
- limb(-14,ty+8,-20-wk*4,ty+44,8,h.col);
- limb(14,ty+8,at?30:18+wk*4,at?ty+10:ty+42,8,h.col);
- // weapon
- const hx=at?30:18+wk*4,hy=at?ty+10:ty+42;g.save();g.translate(hx,hy);g.rotate(at?-1.2+at*2:-.4+Math.sin(t*2)*.05);
- if(h.weapon=='bow'){g.strokeStyle='#ffe9a8';g.lineWidth=3;g.beginPath();g.arc(0,0,26,-1.3,1.3);g.stroke();g.strokeStyle='#fff';g.lineWidth=1;g.beginPath();g.moveTo(7,-25);g.lineTo(7,25);g.stroke();}
- else if(h.weapon=='staff'){g.strokeStyle='#c9a2ff';g.lineWidth=4;g.beginPath();g.moveTo(0,20);g.lineTo(0,-40);g.stroke();g.fillStyle='#8ff';g.shadowColor='#8ff';g.shadowBlur=15;g.beginPath();g.arc(0,-44,6+Math.sin(t*6),0,6.28);g.fill();g.shadowBlur=0;}
- else{const sg=g.createLinearGradient(0,0,0,-50);sg.addColorStop(0,'#aab');sg.addColorStop(1,'#fff');g.fillStyle=sg;g.beginPath();g.moveTo(-3,0);g.lineTo(3,0);g.lineTo(2,-50);g.lineTo(0,-56);g.lineTo(-2,-50);g.fill();g.fillStyle='#ffd34d';g.fillRect(-8,-2,16,4);}
- g.restore();
- // head
- const hy2=ty-18-br*.3,sw=Math.sin(t*1.7)*4+wk*3;
- g.fillStyle=h.hair;g.beginPath();g.moveTo(-13,hy2-6);g.quadraticCurveTo(-18-sw,hy2+20,-10-sw*1.5,hy2+38);g.lineTo(8-sw,hy2+30);g.quadraticCurveTo(14,hy2+10,13,hy2-6);g.fill();
- g.fillStyle=h.skin;g.beginPath();g.ellipse(0,hy2,12,14,0,0,6.28);g.fill();
- g.fillStyle=h.hair;g.beginPath();g.ellipse(-1,hy2-8,14,9,-.2,3.14,6.28);g.fill();g.beginPath();g.moveTo(-14,hy2-6);g.quadraticCurveTo(-4,hy2-2,6,hy2-12);g.lineTo(-2,hy2-16);g.fill();
- // ponytail
- g.beginPath();g.moveTo(-10,hy2-10);g.quadraticCurveTo(-30-sw*2,hy2-4,-26-sw*3,hy2+16);g.quadraticCurveTo(-20-sw,hy2,-8,hy2-4);g.fill();
- const blink=(t%4)<.12;g.fillStyle='#1a1030';if(blink){g.fillRect(3,hy2-1,6,1.5)}else{g.beginPath();g.ellipse(6,hy2,2.2,3,0,0,6.28);g.fill();g.fillStyle='#fff';g.fillRect(6,hy2-2,1.2,1.2);}
- g.strokeStyle='#b5536b';g.lineWidth=1.3;g.beginPath();g.arc(7,hy2+7,3,.2,1.3);g.stroke();
- g.fillStyle=h.acc||'#ffd34d';g.fillRect(-12,hy2-9,24,3);// headband
- g.restore();}
+// realistic sprite heroines with code animation; skins = selective hue shift (no ctx.filter, works on iPadOS 17)
+const IMG=[0,1,2,3,4].map(i=>{const im=new Image();im.src='h'+i+'.webp';im.onload=()=>im.ok=1;return im});
+const VC={};const BHUE=[355,225,275,-1,150];
+function hx2hsl(hex){const n=parseInt(hex.slice(1),16);return rgb2hsl(n>>16,n>>8&255,n&255)}
+function rgb2hsl(r,g2,b){r/=255;g2/=255;b/=255;const mx=Math.max(r,g2,b),mn=Math.min(r,g2,b),l=(mx+mn)/2;let h=0,s2=0;if(mx!=mn){const d=mx-mn;s2=l>.5?d/(2-mx-mn):d/(mx+mn);h=mx==r?(g2-b)/d+(g2<b?6:0):mx==g2?(b-r)/d+2:(r-g2)/d+4;h*=60}return[h,s2,l]}
+function hsl2rgb(h,s2,l){h=((h%360)+360)%360/360;if(!s2)return[l*255,l*255,l*255];const q=l<.5?l*(1+s2):l+s2-l*s2,p=2*l-q,f=t=>{t<0&&(t+=1);t>1&&(t-=1);return t<1/6?p+(q-p)*6*t:t<.5?q:t<2/3?p+(q-p)*(2/3-t)*6:p};return[f(h+1/3)*255,f(h)*255,f(h-1/3)*255]}
+function variant(i,k,small){const key=i+'_'+k+(small?'s':'');if(VC[key])return VC[key];const im=IMG[i];if(!im.ok)return null;
+ const hh=small?260:im.height,ww=Math.round(im.width*hh/im.height),c=document.createElement('canvas');c.width=ww;c.height=hh;const x=c.getContext('2d');x.drawImage(im,0,0,ww,hh);
+ if(k>0){const d=x.getImageData(0,0,ww,hh),p=d.data,[th,ts,tl]=hx2hsl(SKC[i][k]),bh=BHUE[i];
+  for(let j=0;j<p.length;j+=4){if(p[j+3]<10)continue;const[h,s2,l]=rgb2hsl(p[j],p[j+1],p[j+2]);let m=0;
+   if(bh<0){if(s2<.3&&l<.4)m=1}else{let dh=Math.abs(h-bh);dh=Math.min(dh,360-dh);if(dh<(i==0?16:30)&&s2>(i==0?.45:.3))m=1}
+   if(m){let r;if(bh<0)r=hsl2rgb(th,Math.max(ts,.6),l*.6+tl*.35);else r=ts<.15?hsl2rgb(0,0,cl(l*1.25+.1,0,1)):hsl2rgb(th,s2,cl(l*(.7+tl*.6),0,1));p[j]=r[0];p[j+1]=r[1];p[j+2]=r[2]}}
+  x.putImageData(d,0,0)}
+ return VC[key]=c}
+function heroine(x,y,s,h,t,st='idle',face=1){const i=HER.indexOf(h),k=save.skins[i]||0,dh=135*s,small=dh<200,c=variant(i,k,small);if(!c)return;
+ const dw=dh*c.width/c.height,br=Math.sin(t*2.2),wk=st=='walk'?Math.sin(t*9):0,at=st=='attack'?Math.max(0,Math.sin(t*10)):0;
+ g.save();g.translate(x+face*at*10*s,y-Math.abs(wk)*4*s);g.scale(face,1);
+ g.fillStyle='rgba(0,0,0,.35)';g.beginPath();g.ellipse(0,Math.abs(wk)*4*s,dw*.32,6*s,0,0,6.28);g.fill();
+ g.rotate(Math.sin(t*1.3)*.012+wk*.03+at*.08);g.scale(1+br*.006,1+br*.012);
+ if(at>0){g.globalCompositeOperation='lighter';g.globalAlpha=at*.5;const gr=g.createRadialGradient(0,-dh*.5,0,0,-dh*.5,dh*.6);gr.addColorStop(0,h.col);gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.fillRect(-dh*.6,-dh*1.1,dh*1.2,dh*1.2);g.globalAlpha=1;g.globalCompositeOperation='source-over'}
+ g.drawImage(c,-dw/2,-dh,dw,dh);g.restore();}
 const HER=[{name:'Рубина',col:'#e0153a',hair:'#1b0d1a',skin:'#f3c9a8',acc:'#ffd34d',weapon:'sword'},{name:'Сапфира',col:'#1d4fe0',hair:'#f2e1a0',skin:'#f6d4bb',acc:'#cfe8ff',weapon:'bow'},{name:'Аметиста',col:'#8a1fd6',hair:'#2b0f3f',skin:'#e8b996',acc:'#8ff',weapon:'staff'},{name:'Оникс',col:'#2a2a33',hair:'#c2185b',skin:'#d9a07c',acc:'#ff4fa3',weapon:'sword'},{name:'Изумруда',col:'#0fa564',hair:'#6b2e10',skin:'#f3c9a8',acc:'#ffe066',weapon:'bow'}];
 // ---------- BACKGROUNDS ----------
 const stars=Array.from({length:120},()=>({x:rnd(0,1024),y:rnd(0,420),r:rnd(.5,2),p:rnd(0,6)}));
@@ -188,8 +175,8 @@ function reward(c,gm,x,y){save.coins+=c;save.gems+=gm;SV();SFX.win();buzz(60);bu
 function buy(cur,cost,fn,x,y){if(save[cur]<cost){shopMsg='Не хватает '+(cur=='gems'?'💎':'🪙')+' — возьми бесплатно сверху!';shopMsgT=2;SFX.hit();return}save[cur]-=cost;fn();SV();SFX.coin();burst(x,y,'#ff9ee8',30,250);shopMsg='Куплено!';shopMsgT=1.5}
 SCN.shop={draw(dt){applySkins();sky(T,'#1a0a2e','#4a1a5e','#a04a8a');const today=new Date().toDateString();freeCd-=dt;
  g.fillStyle='rgba(10,0,30,.8)';g.fillRect(0,0,W,70);txt('🛍️ МАГАЗИН (всё бесплатно)',W/2,47,30,'#ffd6f5');txt('🪙 '+save.coins,20,47,26,'#ffe066','left');txt('💎 '+save.gems,200,47,26,'#8ff','left');btn(880,10,124,50,'Меню','#888','#333',22);
- const dOk=save.daily!=today,fOk=freeCd<=0;
- const top=[[dOk?'🎁 Ежедневный подарок':'🎁 Завтра ещё!',dOk,()=>{save.daily=today;reward(500,30,150,130)}],[fOk?'🪙 Взять 200 монет':'⏳ '+Math.ceil(freeCd)+' с',fOk,()=>{freeCd=10;reward(200,0,512,130)}],[fOk?'💎 Взять 15 кристаллов':'⏳ '+Math.ceil(freeCd)+' с',fOk,()=>{freeCd=10;reward(0,15,860,130)}]];
+ const dOk=save.daily!=today,fOk=true;
+ const top=[[dOk?'🎁 Ежедневный подарок':'🎁 Завтра ещё!',dOk,()=>{save.daily=today;reward(500,30,150,130)}],[fOk?'🪙 Взять 200 монет':'⏳ '+Math.ceil(freeCd)+' с',fOk,()=>reward(200,0,512,130)],[fOk?'💎 Взять 15 кристаллов':'⏳ '+Math.ceil(freeCd)+' с',fOk,()=>reward(0,15,860,130)]];
  top.forEach((b,i)=>{const x=30+i*330,y=90,pul=b[1]?1+Math.sin(T*5)*.03:1;g.save();g.translate(x+150,y+40);g.scale(pul,pul);btn(-150,-40,300,80,b[0],b[1]?['#ff4fa3','#ffb84f','#38e0a0'][i]:'#555',b[1]?'#5a0b3a':'#222',22);g.restore();for(const p of taps)if(hit(p,x,y,300,80)&&b[1])b[2]()});
  txt('Наряды героинь (💎 25)',W/2,212,24,'#ffe066');
  HER.forEach((h,i)=>{const x=40+i*195;g.fillStyle='rgba(255,255,255,.08)';rr(x,222,180,250,16);g.fill();heroine(x+90,400,1.2,h,T+i,'idle');txt(h.name,x+90,425,18);
